@@ -1,0 +1,259 @@
+include ../php/index.php
+doctype html
+html(lang="ru")
+  head
+    meta(charset="UTF-8")
+    link(rel="stylesheet", href="../css/index.css")
+  body
+    main
+      .wrapper
+        div(ng-app="calcApp",ng-controller="calcCtrl",ng-init="init()").calculator
+          .row
+            .col-xs-4
+              <?php echo $nameCurrency . ": " . $valueCurrency . " руб."; ?>
+            .col-xs-6.text-right
+              span {{ accumulator }}
+          .row
+            .col-xs-12.field
+              input(type="text", value="{{result}}", maxlength="{{ countOfByte }}").field__input
+          .row
+            .col-xs-1
+              input(type="radio", id="hex", name="notation", value="hex", ng-click="switchHex()")
+              label(for="hex") Hex
+            .col-xs-1
+              input(type="radio", id="dec", name="notation", value="dec", ng-click="switchDec()", checked)
+              label(for="dec") Dec
+            .col-xs-1
+              input(type="radio", id="oct", name="notation", value="oct", ng-click="switchOct()")
+              label(for="oct") Oct
+            .col-xs-1
+              input(type="radio", id="bin", name="notation", value="bin", ng-click="switchBin()")
+              label(for="bin") Bin
+            .col-xs-2
+              span.hidden.radio-byte
+                input(type="radio", id="byte8", name="byte", value="byte8", ng-click="byte(8)", checked)
+                label(for="byte8") 8 байт
+            .col-xs-2
+              span.radio-angle
+                input(type="radio", id="deg", name="angle", value="deg", ng-click="calcDeg()")
+                label(for="deg") Градусы
+              span.hidden.radio-byte
+                input(type="radio", id="byte4", name="byte", value="byte4", ng-click="byte(4)")
+                label(for="byte4") 4 байта
+            .col-xs-2
+              span.radio-angle
+                input(type="radio", id="rad", name="angle", value="rad", ng-click="calcRad()", checked)
+                label(for="rad") Радианы
+              span.hidden.radio-byte
+                input(type="radio", id="byte2", name="byte", value="byte2", ng-click="byte(2)")
+                label(for="byte2") 2 байта
+            .col-xs-2
+              span.radio-angle
+                input(type="radio", id="grad", name="angle", value="grad", ng-click="calcGrad()")
+                label(for="grad") Грады
+              span.hidden.radio-byte
+                input(type="radio", id="byte1", name="byte", value="byte1", ng-click="byte(1)")
+                label(for="byte1") 1 байт
+          .row
+            .col-xs-1
+              input(type="checkbox", id="inv", name="inv", value="inv")
+              label(for="inv") Inv
+            .col-xs-1
+              input(type="checkbox", id="hyp", name="hyp", value="hyp")
+              label(for="hyp") Hyp
+            .col-xs-7
+            .col-xs-1
+              button(value="Backspace",ng-click="backspace()").btn.btn-default Backspace
+            .col-xs-1
+              button(value="CE",ng-click="clear()").btn.btn-default CE
+            .col-xs-1
+              button(value="C",ng-click="clearResult()").btn.btn-default C
+          .row.text-center
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="Sta").btn.btn-default Sta
+                tr
+                  td
+                    button(value="Ave",disabled).btn.btn-default Ave
+                tr
+                  td
+                    button(value="Sum",disabled).btn.btn-default Sum
+                tr
+                  td
+                    button(value="s",disabled).btn.btn-default s
+                tr
+                  td
+                    button(value="Dat",disabled).btn.btn-default Dat
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="F-E",ng-click="exponential()",data-hex="false",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default F-E
+                tr
+                  td
+                    button(value="dms",ng-click="dms()",data-hex="false",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default dms
+                tr
+                  td
+                    button(value="sin",ng-click="addTrigOperation('sin')",data-hex="false",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default sin
+                tr
+                  td
+                    button(value="cos",ng-click="addTrigOperation('cos')",data-hex="false",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default cos
+                tr
+                  td
+                    button(value="tg",ng-click="addTrigOperation('tan')",data-hex="false",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default tg
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="(",ng-click="brackets('(')").btn.btn-default (
+                tr
+                  td
+                    button(value="Exp",ng-click="addEmbeddedOperation('exp')",data-hex="false",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default Exp
+                tr
+                  td
+                    button(value="x^y",ng-click="addBinOperation('**')").btn.btn-default x^y
+                tr
+                  td
+                    button(value="x^3",ng-click="addUnOperation('**3')").btn.btn-default x^3
+                tr
+                  td
+                    button(value="x^2",ng-click="addUnOperation('**2')").btn.btn-default x^2
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value=")",ng-click="brackets(')')").btn.btn-default )
+                tr
+                  td
+                    button(value="Ln",ng-click="addEmbeddedOperation('log')").btn.btn-default Ln
+                tr
+                  td
+                    button(value="log",ng-click="addEmbeddedOperation('log10')").btn.btn-default log
+                tr
+                  td
+                    button(value="n!",ng-click="factorialOperator()").btn.btn-default n!
+                tr
+                  td
+                    button(value="1/x",ng-click="fractionOperator()").btn.btn-default 1/x
+            .col-xs-2
+              table
+                tr
+                  td
+                    button(value="MC").btn.btn-default MC
+                tr
+                  td
+                    button(value="MR").btn.btn-default MR
+                tr
+                  td
+                    button(value="MS").btn.btn-default MS
+                tr
+                  td
+                    button(value="M+").btn.btn-default M+
+                tr
+                  td
+                    button(value="pi",ng-click="pi()",data-hex="false",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default pi
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="7",ng-click="updateResult(7)",data-hex="true",data-dec="true",data-oct="true",data-bin="false",disabled).btn.btn-default 7
+                tr
+                  td
+                    button(value="4",ng-click="updateResult(4)",data-hex="true",data-dec="true",data-oct="true",data-bin="false",disabled).btn.btn-default 4
+                tr
+                  td
+                    button(value="1",ng-click="updateResult(1)").btn.btn-default 1
+                tr
+                  td
+                    button(value="0",ng-click="updateResult(0)").btn.btn-default 0
+                tr
+                  td
+                    button(value="A",ng-click="updateResult('A')",data-hex="true",data-dec="false",data-oct="false",data-bin="false",disabled).btn.btn-default A
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="8",ng-click="updateResult(8)",data-hex="true",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default 8
+                tr
+                  td
+                    button(value="5",ng-click="updateResult(5)",data-hex="true",data-dec="true",data-oct="true",data-bin="false",disabled).btn.btn-default 5
+                tr
+                  td
+                    button(value="2",ng-click="updateResult(2)",data-hex="true",data-dec="true",data-oct="true",data-bin="false",disabled).btn.btn-default 2
+                tr
+                  td
+                    button(value="+/-",ng-click="switchSign()").btn.btn-default +/-
+                tr
+                  td
+                    button(value="B",ng-click="updateResult('B')",data-hex="true",data-dec="false",data-oct="false",data-bin="false",disabled).btn.btn-default B
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="9",ng-click="updateResult(9)",data-hex="true",data-dec="true",data-oct="false",data-bin="false",disabled).btn.btn-default 9
+                tr
+                  td
+                    button(value="6",ng-click="updateResult(6)",data-hex="true",data-dec="true",data-oct="true",data-bin="false",disabled).btn.btn-default 6
+                tr
+                  td
+                    button(value="3",ng-click="updateResult(3)",data-hex="true",data-dec="true",data-oct="true",data-bin="false",disabled).btn.btn-default 3
+                tr
+                  td
+                    button(value=".",ng-click="updateResult('.')").btn.btn-default .
+                tr
+                  td
+                    button(value="C",ng-click="updateResult('C')",data-hex="true",data-dec="false",data-oct="false",data-bin="false",disabled).btn.btn-default C
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="/",ng-click="addBinOperation('/')").btn.btn-default /
+                tr
+                  td
+                    button(value="*",ng-click="addBinOperation('*')").btn.btn-default *
+                tr
+                  td
+                    button(value="-",ng-click="addBinOperation('-')").btn.btn-default -
+                tr
+                  td
+                    button(value="+",ng-click="addBinOperation('+')").btn.btn-default +
+                tr
+                  td
+                    button(value="D",ng-click="updateResult('D')",data-hex="true",data-dec="false",data-oct="false",data-bin="false",disabled).btn.btn-default D
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="Mod",ng-click="addBinOperation('%')").btn.btn-default Mod
+                tr
+                  td
+                    button(value="Or",ng-click="addBinOperation('|')").btn.btn-default Or
+                tr
+                  td
+                    button(value="Lsh").btn.btn-default Lsh
+                tr
+                  td
+                    button(value="=",ng-click="equally()").btn.btn-default =
+                tr
+                  td
+                    button(value="E",ng-click="updateResult('E')",data-hex="true",data-dec="false",data-oct="false",data-bin="false",disabled).btn.btn-default E
+            .col-xs-1
+              table
+                tr
+                  td
+                    button(value="And",ng-click="addBinOperation('&')").btn.btn-default And
+                tr
+                  td
+                    button(value="Xor",ng-click="addBinOperation('^')").btn.btn-default Xor
+                tr
+                  td
+                    button(value="Not",ng-click="not()").btn.btn-default Not
+                tr
+                  td
+                    button(value="Int",ng-click="int()").btn.btn-default Int
+                tr
+                  td
+                    button(value="F",data-hex="true",data-dec="false",data-oct="false",data-bin="false",disabled).btn.btn-default F
+    script(src="../js/index.js")
